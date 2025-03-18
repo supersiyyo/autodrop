@@ -4,11 +4,12 @@ import datetime
 import tkinter as tk
 from tkinter import filedialog, scrolledtext
 import json
+import subprocess
 
+# Store config cleanly in AppData\Local\AutoDrop
 CONFIG_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'AutoDrop')
 os.makedirs(CONFIG_DIR, exist_ok=True)
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'autodrop_config.json')
-
 
 # Load saved config if it exists
 def load_config():
@@ -26,6 +27,21 @@ def save_config():
     }
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config_data, f)
+
+# Optional - Pull files from phone using ADB
+def pull_from_phone():
+    phone_path = "/sdcard/DCIM/Camera"
+    local_temp_dir = os.path.join(CONFIG_DIR, 'PhoneDump')
+    os.makedirs(local_temp_dir, exist_ok=True)
+
+    log_output("📱 Pulling files from phone...")
+    try:
+        subprocess.run(['adb', 'pull', phone_path, local_temp_dir], check=True)
+        log_output("✅ Pull complete. Files saved to: " + local_temp_dir)
+        source_entry.delete(0, tk.END)
+        source_entry.insert(0, os.path.join(local_temp_dir, 'Camera'))  # Because adb pulls inside "Camera"
+    except subprocess.CalledProcessError:
+        log_output("❌ ADB Pull Failed. Make sure your phone is connected and USB Debugging is ON.")
 
 # Main transfer logic
 def transfer_videos():
@@ -100,7 +116,7 @@ def select_dest():
 # ✅ UI Setup
 root = tk.Tk()
 root.title("AutoDrop - Data Transfer Tool")
-root.geometry("720x550")
+root.geometry("750x600")
 root.resizable(False, False)
 
 tk.Label(root, text="Source Folder:").pack(anchor='w', padx=10, pady=(10, 0))
@@ -120,9 +136,10 @@ tk.Button(dest_frame, text="Browse", command=select_dest).pack(side='right')
 move_var = tk.BooleanVar(value=True)
 tk.Checkbutton(root, text="Move instead of Copy", variable=move_var).pack(anchor='w', padx=10, pady=10)
 
+tk.Button(root, text="Pull From Phone (ADB)", command=pull_from_phone, bg="#2196F3", fg="white").pack(pady=5)
 tk.Button(root, text="Start Transfer", command=transfer_videos, bg="#4CAF50", fg="white", height=2).pack(pady=5)
 
-output_text = scrolledtext.ScrolledText(root, width=90, height=20, bg="#222", fg="#EEE", font=("Courier", 10))
+output_text = scrolledtext.ScrolledText(root, width=95, height=20, bg="#222", fg="#EEE", font=("Courier", 10))
 output_text.pack(padx=10, pady=10)
 
 # Preload saved values into the GUI
