@@ -28,18 +28,34 @@ def save_config():
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config_data, f)
 
-# Optional - Pull files from phone using ADB
+# Check if ADB device is connected
+def check_device():
+    result = subprocess.run(['adb', 'devices'], capture_output=True, text=True)
+    if "device" in result.stdout.strip().split('\n')[-1]:
+        return True
+    log_output("❌ No ADB device found. Check connection and USB Debugging.")
+    return False
+
+# Pull files from phone using ADB
 def pull_from_phone():
-    phone_path = "/sdcard/Music/.thumbnails"
+    if not check_device():
+        return
+
+    phone_path = "/sdcard/Download/Meta View/"
     local_temp_dir = os.path.join(CONFIG_DIR, 'PhoneDump')
     os.makedirs(local_temp_dir, exist_ok=True)
 
     log_output("📱 Pulling files from phone...")
     try:
-        subprocess.run(['adb', 'pull', phone_path, local_temp_dir], check=True)
-        log_output("✅ Pull complete. Files saved to: " + local_temp_dir)
+        # Pull and timeout to avoid hanging
+        subprocess.run(['adb', 'pull', phone_path, local_temp_dir], check=True, timeout=30)
+        log_output(f"✅ Pull complete. Files saved to: {local_temp_dir}")
+
+        # Since adb creates 'Meta View' subfolder, set that as the source
         source_entry.delete(0, tk.END)
-        source_entry.insert(0, os.path.join(local_temp_dir, 'Camera'))  # Because adb pulls inside "Camera"
+        source_entry.insert(0, os.path.join(local_temp_dir, 'Meta View'))
+    except subprocess.TimeoutExpired:
+        log_output("❌ ADB Pull Timed Out. Check connection and try again.")
     except subprocess.CalledProcessError:
         log_output("❌ ADB Pull Failed. Make sure your phone is connected and USB Debugging is ON.")
 
