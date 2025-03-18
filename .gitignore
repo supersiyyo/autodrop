@@ -1,0 +1,19 @@
+# PyInstaller build directories
+build/
+dist/
+
+# PyInstaller spec file
+autodrop.spec
+
+# AutoDrop generated user config (optional: ignore if you want per-user settings private)
+autodrop_config.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS / Editor specific
+*.DS_Store
+Thumbs.db
