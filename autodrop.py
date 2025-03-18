@@ -30,7 +30,7 @@ def save_config():
 
 # Optional - Pull files from phone using ADB
 def pull_from_phone():
-    phone_path = "/sdcard/DCIM/Camera"
+    phone_path = "/sdcard/Download/Meta View/"
     local_temp_dir = os.path.join(CONFIG_DIR, 'PhoneDump')
     os.makedirs(local_temp_dir, exist_ok=True)
 
