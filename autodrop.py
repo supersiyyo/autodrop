@@ -5,7 +5,10 @@ import tkinter as tk
 from tkinter import filedialog, scrolledtext
 import json
 
-CONFIG_FILE = 'autodrop_config.json'
+CONFIG_DIR = os.path.join(os.getenv('LOCALAPPDATA'), 'AutoDrop')
+os.makedirs(CONFIG_DIR, exist_ok=True)
+CONFIG_FILE = os.path.join(CONFIG_DIR, 'autodrop_config.json')
+
 
 # Load saved config if it exists
 def load_config():
