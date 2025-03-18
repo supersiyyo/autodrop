@@ -6,7 +6,6 @@ from tkinter import filedialog, scrolledtext
 import json
 
 CONFIG_FILE = 'autodrop_config.json'
-VIDEO_EXTENSIONS = ('.mp4', '.mov', '.avi', '.mkv')
 
 # Load saved config if it exists
 def load_config():
@@ -54,29 +53,28 @@ def transfer_videos():
 
         moved_count = 0
         for file in os.listdir(source):
-            if file.lower().endswith(VIDEO_EXTENSIONS):
-                src_path = os.path.join(source, file)
-                dest_path = os.path.join(dated_folder, file)
+            src_path = os.path.join(source, file)
+            dest_path = os.path.join(dated_folder, file)
 
-                log_output(f"{'📥 Moving' if move else '📥 Copying'} {file}...")
-                log_file.write(f"{'Moved' if move else 'Copied'}: {file}\n")
+            log_output(f"{'📥 Moving' if move else '📥 Copying'} {file}...")
+            log_file.write(f"{'Moved' if move else 'Copied'}: {file}\n")
 
-                try:
-                    if move:
-                        shutil.move(src_path, dest_path)
-                    else:
-                        shutil.copy2(src_path, dest_path)
-                    moved_count += 1
-                except Exception as e:
-                    log_output(f"❌ Error: {e}")
-                    log_file.write(f"❌ Error: {e}\n")
+            try:
+                if move:
+                    shutil.move(src_path, dest_path)
+                else:
+                    shutil.copy2(src_path, dest_path)
+                moved_count += 1
+            except Exception as e:
+                log_output(f"❌ Error: {e}")
+                log_file.write(f"❌ Error: {e}\n")
 
         if moved_count:
-            log_output(f"\n✅ Transfer complete! {moved_count} video(s) saved to:\n{dated_folder}")
-            log_file.write(f"\n✅ Transfer complete! {moved_count} video(s).\n")
+            log_output(f"\n✅ Transfer complete! {moved_count} file(s) saved to:\n{dated_folder}")
+            log_file.write(f"\n✅ Transfer complete! {moved_count} file(s).\n")
         else:
-            log_output("\n⚠️ No video files found.")
-            log_file.write("\n⚠️ No video files found.\n")
+            log_output("\n⚠️ No files found.")
+            log_file.write("\n⚠️ No files found.\n")
 
 # Output logs to the GUI console
 def log_output(message):
@@ -98,7 +96,7 @@ def select_dest():
 
 # ✅ UI Setup
 root = tk.Tk()
-root.title("AutoDrop - Video Transfer Tool")
+root.title("AutoDrop - Data Transfer Tool")
 root.geometry("720x550")
 root.resizable(False, False)
 
